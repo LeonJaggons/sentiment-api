@@ -26,5 +26,6 @@ jobs:
               run: |
                   make start
                   make bash-ci
-                  python -m pytest
+                  python -m pip install pytest
+                  pytest
                   make stop
