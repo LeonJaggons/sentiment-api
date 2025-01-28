@@ -31,6 +31,5 @@ jobs:
               run: |
                   make start
                   make bash-ci
-                  python -m pip install pytest
-                  pytest
+                  PYTHONPATH=. pytest
                   make stop
