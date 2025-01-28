@@ -30,6 +30,6 @@ jobs:
             - name: Run tests
               run: |
                   make start
-                  make exec
+                  make bash
                   pytest -v
                   make stop
