@@ -22,6 +22,9 @@ clean:
 
 bash:
 	docker exec -it $(CONTAINER_NAME) /bin/bash
+	
+bash-ci:
+	docker exec $(CONTAINER_NAME) /bin/bash
 
 ps:
 	docker ps -a
