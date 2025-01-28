@@ -29,3 +29,16 @@ bash-ci:
 ps:
 	docker ps -a
 
+start-venv:
+	python3 -m venv venv
+	. venv/bin/activate && pip install -r requirements.txt
+	@echo "Run the following command to activate the virtual environment:"
+	@echo "source venv/bin/activate"
+
+test: start-venv
+	. venv/bin/activate && PYTHONPATH=. pytest
+
+
+run-local: start-venv
+	. venv/bin/activate && uvicorn main:app --host 0.0.0.0 --port 0
+    

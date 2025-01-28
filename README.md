@@ -44,6 +44,22 @@ A Dockerized FastAPI application for analyzing text sentiment and retrieving rec
 
 The API will be available at `http://localhost:80` by default.
 
+### Running the API Locally
+
+Run the application within a virual environment with
+
+```bash
+make run-local
+```
+
+Run local tests with:
+
+```bash
+make test
+```
+
+Accessing the API endpoints will be wholly dependent on the host and port available on your network. This is visible on the line reading ` Uvicorn running on http://0.0.0.0:63891 (Press CTRL+C to quit)`
+
 ### Access the API Documentation
 
 Navigate to `http://localhost:80/docs` to interact with the API endpoints via Swagger UI.
