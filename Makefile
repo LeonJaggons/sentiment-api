@@ -20,7 +20,7 @@ stop:
 clean:
 	docker rmi $(IMAGE_NAME)
 
-exec:
+bash:
 	docker exec -it $(CONTAINER_NAME) /bin/bash
 
 ps:

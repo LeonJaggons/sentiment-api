@@ -17,3 +17,8 @@ def redirect_analyze():
 @app.get("/recent")
 def redirect_recent():
     return RedirectResponse(url="/sentiment/recent", status_code=308)
+
+
+@app.post("/recent/clear")
+def redirect_clear():
+    return RedirectResponse(url="/sentiment/recent/clear", status_code=308)
