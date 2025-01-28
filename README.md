@@ -1,127 +1,175 @@
-# Take Home Readme
-
 # Sentiment Analysis API
 
-This is a FastAPI-based web service that provides sentiment analysis on input text using a machine learning model from Hugging Face. It also supports database storage of analyzed sentiments and maintains a record with timestamps.
+A Dockerized FastAPI application for analyzing text sentiment and retrieving recent analyses.
 
----
+## Features
 
-## Inital set-up
+- **POST /analyze**: Analyze the sentiment of a text input.
+- **GET /recent**: Retrieve the 5 most recent sentiment analyses.
+- Docker support for easy deployment and scalability.
 
-### 1. Clone the repository
+## Prerequisites
 
-```bash
-git clone <repository-url>
-cd <project-folder>
-```
+- Docker installed ([Install Docker](https://docs.docker.com/get-docker/))
 
-### 2. Create and activate a virtual environment
+## Getting Started
 
-```bash
-python -m venv venv
-source venv/bin/activate
-```
+### Installation
 
-### 3. Install the dependencies
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/LeonJaggons/sentiment-api.git
+   cd sentiment-api
+   ```
 
-```bash
-pip install -r requirements.txt
-```
+2. Build the Docker image with:
 
-## Running the API
+   ```bash
+   make build
+   ```
 
-Note: The `/analyze` endpoint will redirect to `/sentiment/analyze`, and `/recent` will redirect to `/sentiment/recent`. FastAPI handles this for you, so you don’t need to worry about the exact path.
+### Running the API
 
-### 1. Start the API server
+1. Start the API service with:
 
-```bash
-uvicorn main:app --reload
-```
+   ```bash
+   make start
+   ```
 
-### 2. View Swagger docs to explore available endpoints
+The API will be available at `http://localhost:80` by default.
 
-```
-http://127.0.0.1:8000/docs
-```
+### Access the API Documentation
 
-Note: http://127.0.0.1:8000 is the default domain and port used in many circumstances. Find the url being used after running the API by looking for the terminal line reading: **Uvicorn running on http://x.x.x.x:PORT**
+Navigate to `http://localhost:80/docs` to interact with the API endpoints via Swagger UI.
 
-### 3. Make a API request with curl or Swagger
+## API Endpoints
 
-You can make API requests using curl directly from the command line. Here’s how to analyze sentiment using the POST method:
+### 1. Analyze text sentiment
 
-### Example 1: Analyze Sentiment with cURL
+- **Endpoint**: `POST /analyze`
 
-Make a POST request to analyze the sentiment of a piece of text:
+- **Description**: Analyze the sentiment of a text string
+
+- **Request Body**:
+
+  ```json
+  {
+    "text": "i've created the best sentiment-api every made!"
+  }
+  ```
+
+- **Response**:
+
+  ```json
+  {
+    "text": "i've created the best sentiment-api every made!",
+    "sentiment": "POSITIVE",
+    "confidence_score": 0.997597873210907,
+    "created_at": "2025-01-28T11:16:13.416354"
+  }
+  ```
+
+### 2. Get recent text sentiment analyses
+
+- **Endpoint**: `GET /recent`
+
+- **Description**: Get the 5 most recent sentiment analyses performed by the API
+
+- **Response**:
+
+  ```json
+  [
+    {
+      "text": "i've created the most alright sentiment-api ever made... i guess ",
+      "sentiment": "POSITIVE",
+      "confidence_score": 0.9548478126525879,
+      "created_at": "2025-01-28T11:18:52.753227"
+    },
+    {
+      "text": "i've created the worst sentiment-api ever made.... ",
+      "sentiment": "NEGATIVE",
+      "confidence_score": 0.999815046787262,
+      "created_at": "2025-01-28T11:18:32.479823"
+    },
+    {
+      "text": "i've created the best sentiment-api every made!",
+      "sentiment": "POSITIVE",
+      "confidence_score": 0.997597873210907,
+      "created_at": "2025-01-28T11:16:13.416354"
+    }
+  ]
+  ```
+
+### 3. Clear text sentiment analyses
+
+- **Endpoint**: `POST /recent/clear`
+
+- **Description**: Clear all recent text sentiments analyzed and stored by the API
+
+- **Response**:
+
+  ```json
+  {
+    "message": "Recent sentiments cleared"
+  }
+  ```
+
+  ```json
+  # `GET /recent`
+  []
+  ```
+
+## Example Usage
+
+While the API can be used directly from the Swagger UI available at `http://localhost/docs`, here are some examples using cURL
+
+### 1. Analyze text sentiment
 
 ```bash
 curl -X 'POST' \
-  'http://127.0.0.1:8000/sentiment/analyze' \
+  'http://localhost/analyze' \
+  -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-  "text": "I absolutely love this API, it's amazing!"
+  "text": "this cURL command will access the most alright sentiment-api ever made... i guess.. hopefully "
 }'
 ```
 
-### Example 2: Get last 5 Sentiment Records with cURL
+### 2. Get recent text sentiment analyses
 
 ```bash
-curl -X 'GET' 'http://127.0.0.1:8000/sentiment'
+curl -X 'GET' \
+  'http://localhost/recent' \
+  -H 'accept: application/json'
 ```
 
-## Using Swagger UI
-
-FastAPI provides an interactive web-based interface to test API endpoints through Swagger UI. Here’s how to use it:
-
-### 1. Start the API server if it’s not running yet:
+### 3. Clear text sentiment analyses
 
 ```bash
-uvicorn main:app --reload
+curl -X 'POST' \
+  'http://localhost/recent/clear' \
+  -H 'accept: application/json' \
+  -d ''
 ```
 
-### Access Swagger UI: Open your web browser and go to the following URL:
+## Testing
 
-```text
-http://127.0.0.1:8000/docs
-```
+To test with pytest, we have to ensure the container is running and proceed to exec into it using the commands available in the Makefile. After this, we are able to run the `pytest` command as normal.
 
-### Analyze Sentiment:
+1. Start the API service using:
 
--   In the Swagger UI, find the `/sentiment/analyze` endpoint under the "POST" section.
+   ```bash
+   make start
+   ```
 
--   Click on it to expand the options.
--   Enter the text you want to analyze in the provided field (e.g., "testing API").
--   Click on `Execute` to send the request.
+2. Execute into the API service's running container with:
 
-### Get All Sentiment Records:
+   ```bash
+   make bash
+   ```
 
--   Scroll to the /sentiment/all endpoint under the "GET" section.
--   Click on "Execute" to retrieve all sentiment records stored in the database.
+3. Run `pytest` inside the container with:
 
-## Running Unit Tests
-
-o run the unit tests in the `tests/` directory, you can use `pytest` with the `PYTHONPATH` set to the current directory. This ensures that Python can locate the `app` module when running the tests.
-
-### Set the `PYTHONPATH` and Run Tests
-
-In the terminal, navigate to the root of your project (where `README.md` and `app/` are located), then run the following command:
-
-```bash
-PYTHONPATH=$(pwd) pytest tests/
-```
-
-### View the Test Results
-
-After running the tests, you’ll see the output in the terminal. If all tests pass, you will see something like:
-
-```bash
-============================================================================ test session starts ============================================================================
-platform darwin -- Python 3.12.4, pytest-8.3.4, pluggy-1.5.0
-rootdir: /Users/leonjaggon/go/sentiment-api
-plugins: anyio-4.8.0
-collected 9 items
-
-tests/test_endpoints.py .........                                                                                                                                     [100%]
-
-============================================================================= 9 passed in 2.41s =============================================================================
-```
+   ```bash
+   pytest -v
+   ```

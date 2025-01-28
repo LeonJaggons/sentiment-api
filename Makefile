@@ -29,6 +29,3 @@ bash-ci:
 ps:
 	docker ps -a
 
-
-test-local:
-	PYTHONPATH=. pytest tests/
