@@ -36,6 +36,12 @@ A Dockerized FastAPI application for analyzing text sentiment and retrieving rec
    make start
    ```
 
+2. Optional: Interact with the service via the command line with:
+
+   ```bash
+   make bash
+   ```
+
 The API will be available at `http://localhost:80` by default.
 
 ### Access the API Documentation
@@ -173,3 +179,5 @@ To test with pytest, we have to ensure the container is running and proceed to e
    ```bash
    pytest -v
    ```
+
+These tests will also automatically be run on every push to the `main` branch via the `test` CI workflow in Github Actions.
