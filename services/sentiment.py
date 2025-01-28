@@ -22,9 +22,10 @@ def is_invalid_text(text: str | None) -> dict[str, str] | None:
     Returns:
         dict[str, str] | None: The error message if the text is invalid, otherwise None
     """
+
     if not text or text == "":
         return {"status_code": 400, "message": "'text' field is required"}
-    if not len(text.split(" ")) <= MAX_TEXT_LENGTH:
+    if len(text.split(" ")) > MAX_TEXT_LENGTH:
         return {
             "status_code": 422,
             "message": f"'text' is too long. Max length is {MAX_TEXT_LENGTH} words",
@@ -44,7 +45,14 @@ def get_text_sentiment(text: str) -> SentimentAnalysisResponse | JSONResponse:
     Args:
         text (str): The text to be analyzed
     Returns:
-        SentimentAnalysisResponse: The sentiment analysis result"""
+        SentimentAnalysisResponse: The sentiment analysis result
+    """
+
+    error = is_invalid_text(text)
+    if error:
+        return JSONResponse(
+            status_code=error["status_code"], content={"detail": error["message"]}
+        )
 
     sentiment = sentiment_analyzer(text)
     sentiment_data = sentiment[0]
@@ -86,3 +94,13 @@ def get_recent_sentiment(limit: int = 5) -> list[SentimentAnalysisResponse]:
         processed_sentiments, key=lambda x: x["created_at"], reverse=True
     )
     return sorted_sentiments[:limit]
+
+
+def clear_recent_sentiment():
+    """
+    Clear the list of recent sentiment analysis results
+    """
+    processed_sentiments.clear()
+    return JSONResponse(
+        status_code=200, content={"message": "Recent sentiments cleared"}
+    )

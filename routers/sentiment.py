@@ -18,16 +18,14 @@ router = APIRouter()
 def analyze_sentiment(
     request: SentimentAnalysisRequest | InvalidSentimentAnalysisRequest,
 ) -> SentimentAnalysisResponse:
-    # Guard clauses to ensure the request is valid
-    error = sentiment_service.is_invalid_text(request.text)
-    if error:
-        return JSONResponse(
-            status_code=error["status_code"], content={"detail": error["message"]}
-        )
-
     return sentiment_service.get_text_sentiment(request.text)
 
 
 @router.get("/recent", status_code=200)
 def get_recent_sentiment(limit: int = 5) -> list[SentimentAnalysisResponse]:
     return sentiment_service.get_recent_sentiment(limit)
+
+
+@router.post("/recent/clear", status_code=200)
+def clear_recent_sentiment() -> JSONResponse:
+    return sentiment_service.clear_recent_sentiment()
