@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-# Strongly typed data models to be used in the sentiment analysis service
+# Strongly typed data models to be used in the sentiment analysis router
 # for validating requests, better code transparency and readability
 
 

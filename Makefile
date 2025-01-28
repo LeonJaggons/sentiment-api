@@ -8,7 +8,7 @@ build:
 rebuild:
 	docker build --no-cache -t $(IMAGE_NAME) .
 
-run:
+start:
 	docker run -d --name $(CONTAINER_NAME) -p $(PORT):80 $(IMAGE_NAME)
 
 remove:
@@ -26,5 +26,6 @@ exec:
 ps:
 	docker ps -a
 
+
 test-local:
-	PYTHONPATH=${pwd} pytest tests/
+	PYTHONPATH=. pytest tests/

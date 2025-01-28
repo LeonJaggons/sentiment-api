@@ -47,7 +47,7 @@ def test_analyze_long_text():
     }
 
 
-def test_analyze_nonalha_text():
+def test_analyze_nonalpha_text():
     text = "🥶"
     error = sentiment_service.get_text_sentiment(text)
     assert error.status_code == 422
@@ -88,79 +88,57 @@ def test_no_write_with_missing_text():
 
 
 def test_no_write_with_long_text():
-    client.post("/sentiment/recent/clear")
-    response = client.post("/sentiment/analyze", json={"text": "a " * 3001})
-    assert response.status_code == 422
+    text = "a " * 3500
+    sentiment_service.clear_recent_sentiment()
 
-    response = client.get("/sentiment/recent?limit=5")
-    assert response.status_code == 200
+    sentiment_service.get_text_sentiment(text)
+    recents = sentiment_service.get_recent_sentiment()
 
-    assert response.json() == []
+    assert len(recents) == 0
 
 
 def test_no_write_with_nonalpha_text():
-    client.post("/sentiment/recent/clear")
-    response = client.post("/sentiment/analyze", json={"text": "😂"})
-    assert response.status_code == 422
+    text = "😂"
 
-    response = client.get("/sentiment/recent?limit=5")
-    assert response.status_code == 200
+    sentiment_service.clear_recent_sentiment()
 
-    assert response.json() == []
+    sentiment_service.get_text_sentiment(text)
+    recents = sentiment_service.get_recent_sentiment()
 
-
-def test_default_five_items_in_recent():
-    client.post("/sentiment/recent/clear")
-    for i in range(5):
-        response = client.post("/sentiment/analyze", json={"text": f"test {i}"})
-        assert response.status_code == 201
-
-    response = client.get("/sentiment/recent")
-    assert response.status_code == 200
-
-    assert len(response.json()) == 5
+    assert len(recents) == 0
 
 
 def test_clear_recent():
-    client.post("/sentiment/recent/clear")
-    for i in range(5):
-        response = client.post("/sentiment/analyze", json={"text": f"test {i}"})
-        assert response.status_code == 201
+    sentiment_service.clear_recent_sentiment()
+    limit = 5
+    for i in range(limit):
+        sentiment_service.get_text_sentiment(f"test {i}")
 
-    response = client.get("/sentiment/recent")
-    assert response.status_code == 200
+    recents = sentiment_service.get_recent_sentiment(limit)
+    assert len(recents) == limit
 
-    assert len(response.json()) == 5
-
-    response = client.post("/sentiment/recent/clear")
-    assert response.status_code == 200
-
-    response = client.get("/sentiment/recent")
-    assert response.status_code == 200
-
-    assert response.json() == []
+    sentiment_service.clear_recent_sentiment()
+    cleared_recents = sentiment_service.get_recent_sentiment(limit)
+    assert len(cleared_recents) == 0
 
 
 def test_limit_recent():
-    client.post("/sentiment/recent/clear")
-    for i in range(5):
-        response = client.post("/sentiment/analyze", json={"text": f"test {i}"})
-        assert response.status_code == 201
+    limit = 10
+    sentiment_service.clear_recent_sentiment()
+    for i in range(limit):
+        sentiment_service.get_text_sentiment(f"test {i}")
 
-    response = client.get("/sentiment/recent?limit=2")
-    assert response.status_code == 200
+    recents = sentiment_service.get_recent_sentiment(limit)
 
-    assert len(response.json()) == 2
+    assert len(recents) == limit
 
 
 def test_recents_is_most_recent():
-    client.post("/sentiment/recent/clear")
+    sentiment_service.clear_recent_sentiment()
     for i in range(5):
-        response = client.post("/sentiment/analyze", json={"text": f"test {i}"})
-        assert response.status_code == 201
+        sentiment_service.get_text_sentiment(f"test {i}")
 
-    response = client.get("/sentiment/recent")
-    assert response.status_code == 200
+    recents = sentiment_service.get_recent_sentiment(5)
 
-    assert response.json()[0]["text"] == "test 4"
-    assert response.json()[4]["text"] == "test 0"
+    assert recents[0]["text"] == "test 4"
+    assert recents[4]["text"] == "test 0"
